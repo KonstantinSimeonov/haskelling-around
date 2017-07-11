@@ -1,0 +1,2 @@
+# Falling rocks
+Haskell implementation of the falling rocks game. Rocks fall from the sky (*kamynite padat, padat ot nebeto*), you are a dwarf and you must avoid them. You can move left by pressing **'a'** and right by pressing **'b'**.
