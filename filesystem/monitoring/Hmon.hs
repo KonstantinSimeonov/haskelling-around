@@ -13,9 +13,9 @@ setInterval ms action initial = do
     threadDelay $ ms * 1000
     actionResult <- action initial
     setInterval ms action actionResult
-    
-runhaskell :: FilePath -> IO ()
-runhaskell path = callProcess "/usr/bin/runhaskell" [path]
+
+runCmd :: String -> FilePath -> IO ()
+runCmd command path = callProcess command [path]
 
 ignoreError :: IO () -> IO ()
 ignoreError x = catch x ignore
@@ -25,17 +25,16 @@ ignoreError x = catch x ignore
 
 main :: IO ()
 main = do
-    filePath <- fmap head getArgs
+    args <- getArgs
+    let filePath = head args
+    let command  = args !! 1
     fullPath <- canonicalizePath filePath
     putStrLn $ "Watching file " ++ fullPath
-    putStrLn $ replicate 100 '*'
-    ignoreError $ runhaskell fullPath
+    ignoreError $ runCmd command fullPath
     lastTimeModified <- getModificationTime fullPath
-    setInterval 1000 (
-        \time -> do
+    setInterval 1000 (\time -> do
             newTime <- getModificationTime filePath
             if time < newTime
-                then ignoreError $ runhaskell fullPath
+                then ignoreError $ runCmd command fullPath
                 else return () :: IO ()
-            return newTime
-        ) lastTimeModified
+            return newTime) lastTimeModified
